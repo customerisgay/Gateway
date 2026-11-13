@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block title %}API Documentation — Godpay{% endblock %}
+{% block content %}
+<div class="container docs-layout">
+  <nav class="docs-nav">
+    <a href="#auth">1. Authentication</a>
+    <a href="#flow">2. Payment flow</a>
+    <a href="#create">3. POST /order/create</a>
+    <a href="#status">4. GET /order/status</a>
+    <a href="#verify">5. POST /order/verify-utr</a>
+    <a href="#list">6. GET /orders</a>
+    <a href="#webhook">7. Webhooks &amp; signature</a>
+    <a href="#amounts">8. Decimal offset</a>
+    <a href="#limits">9. Rate limits &amp; errors</a>
+    <a href="#testmode">10. Testing your integration</a>
+  </nav>
+
+  <div class="docs-body"><div class="card" style="margin-bottom:22px"><h3>Manual payment links</h3><p>Create a link in <a href="/playground">API Playground</a> using a saved API key.</p></div>
+    <h2 id="auth">1. Authentication</h2>
+    <p>Every API call uses your key in the header. Generate one at <a href="/api-keys">Dashboard → API Keys</a>.</p>
+    <pre class="codeblock">X-Api-Key: fp_live_your_key_here
+<span class="c"># or</span>
+Authorization: Bearer fp_live_your_key_here</pre>
+
+    <h2 id="flow">2. Payment flow</h2>
+    <div class="kv">
+      <code>1</code><span>Your server calls <code>POST /api/v1/order/create</code></span>
+      <code>2</code><span>Godpay returns a <code>payment_url</code>, UPI link and QR (base64)</span>
+      <code>3</code><span>Customer scans &amp; pays the <strong>exact</strong> amount shown</span>
+      <code>4</code><span>Godpay auto-verifies via FamPay email IMAP / BharatPe feed — or, for official gateways, via the gateway's signed webhook/status API — and marks the order PAID</span>
+      <code>5</code><span>Your server is notified via <strong>webhook</strong> (<code>payment.verified</code>), or you poll <code>/order/status</code></span>
+    </div>
+
+    <h2 id="create">3. POST /api/v1/order/create</h2>
+    <p>Creates an order and returns everything you need to render a checkout.</p>
+    <pre class="codeblock">curl -X POST {{ base }}/api/v1/order/create \
+  -H "Content-Type: application/json" \
+  -H "X-Api-Key: fp_live_your_key_here" \
+  -d '{
+    "amount": 250,
+    "order_id": "INV-2026-991",
+    "provider": "auto",
+    "customer_email": "rohan&#64;example.com",
+    "customer_name": "Rohan Gupta",
+    "note": "Pro Plan Renewal",
+    "expiry_minutes": 15
+  }'</pre>
+    <p><strong>Response 200:</strong></p>
+    <pre class="codeblock">{
+  "success": true,
+  "order_id": "ord_9f8e7d6c5b4a3928171",
+  "provider": "fampay",
+  "amount": 250.0,
+  "exact_amount": 250.42,
+  "currency": "INR",
+  "client_ref": "INV-2026-991",
+  "payment_url": "{{ base }}/pay/ord_9f8e7d6c5b4a3928171",
+  "upi_link": "upi://pay?pa=yourname@fam&amp;pn=...&amp;am=250.42&amp;cu=INR&amp;...",
+  "qr_base64": "data:image/png;base64,iVBORw0KGgo...",
+  "expires_at": 1762950900,
+  "expires_in_sec": 900
+}</pre>
+    <div class="kv">
+      <code>amount</code><span>required, ₹1 – ₹5,00,000</span>
+      <code>order_id</code><span>your reference (stored as client_ref, returned in status + webhooks)</span>
+      <code>provider</code><span><code>fampay</code> | <code>bharatpe</code> | <code>razorpay</code> | <code>phonepe</code> | <code>paytm</code> | <code>cashfree</code> | <code>mobikwik</code> | <code>auto</code> (your default). Official gateways must be enabled + configured in Dashboard → Payments first.</span>
+      <code>expiry_minutes</code><span>1–60, default 15</span>
+      <code>customer_email</code><span>optional — gets an automatic payment-receipt email (SMTP must be configured)</span>
+    </div>
+
+    <p><strong>With an official gateway</strong> (e.g. <code>"provider": "razorpay"</code>) the same call returns <code>payment_url</code> (gateway-hosted checkout, or our status page for Paytm/MobiKwik that boots their checkout), an empty <code>upi_link</code>, and <code>exact_amount == amount</code>. The returned order settles automatically once the gateway's webhook confirms payment — or on the next status poll.</p>
+
+    <h2 id="pg">3a. Official gateways (Razorpay, PhonePe, Paytm, Cashfree, MobiKwik–Zaakpay)</h2>
+    <p>Godpay acts as the <em>orchestration layer</em>, not the money-holder: you register as a merchant with the gateway, paste your keys in <a href="/settings">Dashboard → Payments</a> (stored encrypted, Fernet/AES), and Godpay creates payments there, verifies their callbacks, marks orders PAID and fires your webhook. Your money settles in <em>your</em> gateway account; Godpay never sees card data.</p>
+    <pre class="codeblock">// Razorpay — Payment Links API (rzp_test_*/rzp_live_* keys)
+// PhonePe   — Standard Checkout (merchantId + saltKey, pg-sandbox or hermes)
+// Paytm     — All-in-One JS checkout (MID + 16-char merchant key)
+// Cashfree  — Payment Links API (x-client-id / x-client-secret)
+// MobiKwik  — Zaakpay Express Checkout V13 (merchantIdentifier + secret, HMAC-SHA256 forms)</pre>
+    <div class="kv">
+      <code>webhooks</code><span>gateways call <code>{{ base }}/webhooks/&lt;provider&gt;</code> — we HMAC/checksum-verify before touching the order. Razorpay also supports a signed <code>GET</code> browser callback (payment_link + payment_id + signature triple).</span>
+      <code>fallback</code><span>status polls (every ~60s, and on <code>/order/status</code>) re-check pending gateway orders server-side, so a missed webhook still settles your order.</span>
+      <code>GPay</code><span>Google Pay has <strong>no</strong> merchant collection API. It is a payer app — accept it via any UPI rail above (QR/deep links, or inside a gateway checkout).</span>
+    </div>
+
+    <h2 id="status">4. GET /api/v1/order/status</h2>
+    <pre class="codeblock">curl "{{ base }}/api/v1/order/status?order_id=ord_9f8e7d6c5b4a3928171" \
+  -H "X-Api-Key: fp_live_your_key_here"
+<span class="c"># or POST with JSON: {"order_id": "..."} — or look up by ?client_ref=INV-2026-991</span></pre>
+    <pre class="codeblock">{
+  "success": true,
+  "order_id": "ord_9f8e7d6c5b4a3928171",
+  "status": "PAID",              <span class="c">// PENDING | PAID | EXPIRED | CANCELLED</span>
+  "amount": 250.0,
+  "exact_amount": 250.42,
+  "utr": "412345678901",          <span class="c">// present when PAID</span>
+  "payer_name": "ROHIT KUMAR",
+  "paid_at": 1762950322,
+  "time_remaining": 512
+}</pre>
+    <p>Status polls trigger an on-demand provider scan (throttled), so polling every 3–5s gives near-realtime confirmation.</p>
+
+    <h2 id="verify">5. POST /api/v1/order/verify-utr</h2>
+    <p>Manual fallback when the customer paid the wrong amount or the auto-match window missed. UTR is de-duplicated globally — a claimed UTR can't verify twice.</p>
+    <pre class="codeblock">curl -X POST {{ base }}/api/v1/order/verify-utr \
+  -H "Content-Type: application/json" \
+  -H "X-Api-Key: fp_live_your_key_here" \
+  -d '{"order_id": "ord_9f8e...", "utr": "412345678901"}'</pre>
+
+    <h2 id="list">6. GET /api/v1/orders</h2>
+    <pre class="codeblock">curl "{{ base }}/api/v1/orders?status=PAID&amp;limit=25" -H "X-Api-Key: fp_live_..."</pre>
+
+    <h2 id="webhook">7. Webhooks &amp; signature verification</h2>
+    <p>Set your URL at <a href="/webhooks">Dashboard → Webhooks</a>. Events: <code>payment.verified</code>, <code>payment.test</code>. Every request carries:</p>
+    <div class="kv">
+      <code>X-FamGate-Event</code><span><code>payment.verified</code></span>
+      <code>X-FamGate-Signature</code><span><code>sha256=&lt;hex&gt;</code> — HMAC-SHA256 of the raw request body, keyed with your webhook secret</span>
+    </div>
+    <p><strong>Python:</strong></p>
+    <pre class="codeblock">import hmac, hashlib
+
+def famgate_valid(raw_body: bytes, sig_header: str, secret: str) -> bool:
+    expected = "sha256=" + hmac.new(secret.encode(), raw_body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, sig_header or "")</pre>
+    <p><strong>Node.js:</strong></p>
+    <pre class="codeblock">const crypto = require('crypto');
+const expected = 'sha256=' + crypto.createHmac('sha256', SECRET).update(rawBody).digest('hex');
+const ok = crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(req.headers['x-famgate-signature'] || ''));</pre>
+    <p>Respond with any 2xx within 10s. Delivery attempts and response bodies are logged at <a href="/webhooks">Dashboard → Webhooks</a>. Always verify the signature <em>and</em> idempotency on <code>order_id</code>.</p>
+
+    <h2 id="amounts">8. The decimal-offset contract</h2>
+    <p>With decimal offset enabled (default), Godpay quotes ₹100 as e.g. <strong>₹100.42</strong>. The paise are the order's fingerprint: a hundred concurrent ₹100 orders each get a different offset, and incoming money is matched deterministically — zero collision, no customer typing UTRs. Show the exact amount big and bold with a one-tap copy button (the hosted checkout does this for you). Disable in Dashboard → Payments if you accept manual-UTR matching instead.</p>
+
+    <h2 id="limits">9. Rate limits &amp; errors</h2>
+    <div class="kv">
+      <code>create</code><span>60 / min per key</span>
+      <code>status</code><span>600 / min per key</span>
+      <code>verify-utr</code><span>60 / min per key</span>
+      <code>all</code><span>300 / min per IP</span>
+      <code>400</code><span>validation error — <code>{"success": false, "error": "…"}</code></span>
+      <code>401</code><span>missing / invalid / revoked API key</span>
+      <code>404</code><span>order not found (for this merchant)</span>
+      <code>409</code><span>UTR already claimed by another order</span>
+      <code>429</code><span>rate limited — back off</span>
+      <code>502</code><span>upstream (BharatPe/Google/gateway) error</span>
+    </div>
+
+    <h2 id="testmode">10. Testing your integration</h2>
+    <ol style="padding-left:1.3rem">
+      <li><strong>Send test webhook</strong> — Dashboard → Webhooks → <em>Send test webhook</em> delivers a <code>payment.test</code> event to your endpoint.</li>
+      <li><strong>Live ₹1 order</strong> — create a real order of ₹1 from the API, pay it from any UPI app, and watch it verify end-to-end in seconds.</li>
+    </ol>
+  </div>
+</div>
+{% endblock %}

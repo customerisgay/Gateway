@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block title %}Payments — Godpay{% endblock %}
+{% block content %}
+
+<div class="container page">
+  <div class="page-head">
+    <div>
+      <h1>Payments</h1>
+      <p>Manage payment providers.</p>
+    </div>
+  </div>
+
+  <!-- General -->
+  <form class="card" method="post" action="/settings/general">
+    <h3 class="section-title">General</h3>
+    <div class="two-col">
+      <div>
+        <label class="flabel" for="display_name">Default payee display name</label>
+        <input type="text" id="display_name" name="display_name" value="{{ settings.display_name }}" placeholder="Sharma Electronics" maxlength="80">
+      </div>
+      <div>
+        <label class="flabel" for="default_provider">Default provider</label>
+        <select id="default_provider" name="default_provider">
+          <option value="fampay" {{ 'selected' if settings.default_provider == 'fampay' }}>FamPay (IMAP verification)</option>
+          <option value="bharatpe" {{ 'selected' if settings.default_provider == 'bharatpe' }}>BharatPe (Merchant API)</option>
+          {% for panel in pg_panels %}
+          <option value="{{ panel.name }}" {{ 'selected' if settings.default_provider == panel.name }}>{{ panel.title }} (official gateway)</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <label class="toggle" style="margin-top:1rem"><input type="checkbox" name="decimal_offset" value="on" {{ 'checked' if settings.decimal_offset }}> Decimal-offset amounts — quote ₹100.42 instead of ₹100 so payments auto-match without UTR typing</label>
+    <div class="btn-row" style="margin-top:1rem"><button class="btn btn-sm btn-dark" type="submit">Save general settings</button></div>
+  </form>
+
+  <!-- FamPay -->
+  <form class="card provider-card" method="post" action="/settings/fampay">
+    <div class="provider-head fampay">
+      <h2>FamPay <span class="muted small" style="font-weight:600">via Gmail IMAP verification</span></h2>
+      <span class="badge {{ 'live' if settings.fampay_enabled else 'off' }}">{{ 'ENABLED' if settings.fampay_enabled else 'DISABLED' }}</span>
+    </div>
+
+    <div class="flash {{ 'ok' if fampay_ready else 'warn' }}" style="margin-top:0">
+      {{ 'FamPay is configured and ready.' if fampay_ready else 'Not ready yet — fill the fields below and enable it.' }}
+    </div>
+
+    <label class="toggle"><input type="checkbox" name="fampay_enabled" value="on" {{ 'checked' if settings.fampay_enabled }}> Enable FamPay payments</label>
+
+    <div class="two-col">
+      <div>
+        <label class="flabel" for="fampay_email">Gmail that receives FamPay payment emails</label>
+        <input type="email" id="fampay_email" name="fampay_email" value="{{ settings.fampay_email }}" placeholder="you@gmail.com" maxlength="160" autocomplete="off">
+      </div>
+      <div>
+        <label class="flabel" for="fampay_app_password">Google App Password <small>— 16 chars, NOT your Gmail password</small></label>
+        <input type="password" id="fampay_app_password" name="fampay_app_password" placeholder="{{ '•••• •••• •••• ••••  (saved — leave blank to keep)' if settings.fampay_app_password_enc else 'abcd efgh ijkl mnop' }}" autocomplete="new-password">
+        <p class="form-note">Create one at <strong>myaccount.google.com → Security → 2-Step Verification → App passwords</strong> (enable IMAP in Gmail settings).</p>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <label class="flabel" for="fampay_upi">Your FamPay UPI ID</label>
+        <input type="text" id="fampay_upi" name="fampay_upi" value="{{ settings.fampay_upi }}" placeholder="yourname@fam" maxlength="80" autocomplete="off">
+      </div>
+      <div>
+        <label class="flabel" for="imap_host">IMAP host <small>— advanced</small></label>
+        <input type="text" id="imap_host" name="imap_host" value="{{ settings.imap_host }}" placeholder="imap.gmail.com" maxlength="120">
+      </div>
+    </div>
+    <div class="two-col">
+      <div>
+        <label class="flabel" for="imap_folder">Mailbox folder</label>
+        <input type="text" id="imap_folder" name="imap_folder" value="{{ settings.imap_folder }}" placeholder="INBOX" maxlength="60">
+      </div>
+      <div class="form-note" style="align-self:end;padding-bottom:.7rem">We only read <strong>UNSEEN</strong> payment emails and mark them read after settling the order.</div>
+    </div>
+
+    <div class="btn-row" style="margin-top:1.1rem">
+      <button class="btn btn-sm btn-dark" type="submit">Save FamPay</button>
+      <button class="btn btn-sm btn-ghost" type="submit" formaction="/settings/fampay/test" formnovalidate>Test IMAP connection</button>
+    </div>
+    <p class="form-note" style="margin-top:.5rem">Leave secret fields blank to keep saved credentials.</p>
+
+  </form>
+
+  <!-- BharatPe -->
+  <form class="card provider-card" method="post" action="/settings/bharatpe">
+    <div class="provider-head bharatpe">
+      <h2>BharatPe <span class="small" style="font-weight:600;opacity:.85">via Merchant ID + API token</span></h2>
+      <span class="badge {{ 'live' if settings.bharatpe_enabled else 'off' }}">{{ 'ENABLED' if settings.bharatpe_enabled else 'DISABLED' }}</span>
+    </div>
+
+    <div class="flash {{ 'ok' if bharatpe_ready else 'warn' }}" style="margin-top:0">
+      {{ 'BharatPe is configured and ready.' if bharatpe_ready else 'Not ready yet — fill the fields below and enable it.' }}
+    </div>
+
+    <label class="toggle"><input type="checkbox" name="bharatpe_enabled" value="on" {{ 'checked' if settings.bharatpe_enabled }}> Enable BharatPe payments</label>
+
+    <div class="two-col">
+      <div>
+        <label class="flabel" for="bharatpe_mid">BharatPe Merchant ID</label>
+        <input type="text" id="bharatpe_mid" name="bharatpe_mid" value="{{ settings.bharatpe_mid }}" placeholder="e.g. 10543021" maxlength="60" autocomplete="off">
+        <p class="form-note">Log in at <strong>enterprise.bharatpe.in</strong> → open DevTools → Network → any <code class="inline">merchantId=</code> param in a transactions request.</p>
+      </div>
+      <div>
+        <label class="flabel" for="bharatpe_token">BharatPe API token</label>
+        <input type="password" id="bharatpe_token" name="bharatpe_token" placeholder="{{ '••••••••••••••••  (saved — leave blank to keep)' if settings.bharatpe_token_enc else 'Paste the token from the request headers' }}" autocomplete="new-password">
+        <p class="form-note">Same DevTools request → Request Headers → copy the <code class="inline">token</code> header value.</p>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <label class="flabel" for="bharatpe_vpa">BharatPe UPI ID (collect VPA)</label>
+        <input type="text" id="bharatpe_vpa" name="bharatpe_vpa" value="{{ settings.bharatpe_vpa }}" placeholder="yourname@unitype or @yesbank" maxlength="80" autocomplete="off">
+        <p class="form-note">Printed on your BharatPe QR standee / profile — usually ends with <code class="inline">@unitype</code> or <code class="inline">@yesbank</code>.</p>
+      </div>
+      <div class="form-note" style="align-self:end;padding-bottom:.7rem">We poll <code class="inline">payments-tesseract.bharatpe.in</code> (the endpoint the enterprise dashboard itself uses) every ~5s and match by exact amount + bank reference.</div>
+    </div>
+
+    <div class="btn-row" style="margin-top:1.1rem">
+      <button class="btn btn-sm btn-dark" type="submit">Save BharatPe</button>
+      <button class="btn btn-sm btn-ghost" type="submit" formaction="/settings/bharatpe/test" formnovalidate>Test BharatPe API</button>
+    </div>
+    <p class="form-note" style="margin-top:.5rem">Leave secret fields blank to keep saved credentials.</p>
+
+  </form>
+
+  <!-- Official gateways (PG adapters) -->
+  <div class="page-head" style="margin-top:2rem;margin-bottom:.4rem">
+    <div>
+      <h2 style="margin:.2rem 0">Official gateways <span class="muted small" style="font-weight:600">— hosted checkout, UPI + cards + netbanking</span></h2>
+      <p class="small" style="margin:0">Connect your gateway merchant account. Payments are confirmed through verified provider responses.</p>
+    </div>
+  </div>
+
+  {% for panel in pg_panels %}
+  <form class="card provider-card" method="post" action="/settings/pg/{{ panel.name }}">
+    <div class="provider-head {{ panel.name }}">
+      <h2>{{ panel.icon }} {{ panel.title }} <span class="small" style="font-weight:600;opacity:.85">{{ panel.cta_note }}</span></h2>
+      <span class="badge {{ 'live' if panel.enabled else 'off' }}">{{ 'ENABLED' if panel.enabled else 'DISABLED' }}</span>
+    </div>
+
+    <label class="toggle"><input type="checkbox" name="enabled" value="on" {{ 'checked' if panel.enabled }}> Enable {{ panel.title }} payments</label>
+
+    <div class="two-col">
+      {% for field, label, secret in panel.fields %}
+      <div>
+        {% if field == 'env' %}
+        <label class="flabel" for="{{ panel.name }}_{{ field }}">{{ label }}</label>
+        <select id="{{ panel.name }}_{{ field }}" name="{{ field }}">
+          {% if panel.name == 'paytm' %}
+          <option value="staging" {{ 'selected' if panel.masked[field] != 'production' }}>Staging (securegw-stg.paytm.in)</option>
+          <option value="production" {{ 'selected' if panel.masked[field] == 'production' }}>Production (securegw.paytm.in)</option>
+          {% else %}
+          <option value="sandbox" {{ 'selected' if panel.masked[field] != 'production' }}>Sandbox (test keys)</option>
+          <option value="production" {{ 'selected' if panel.masked[field] == 'production' }}>Production (live keys)</option>
+          {% endif %}
+        </select>
+        {% else %}
+        <label class="flabel" for="{{ panel.name }}_{{ field }}">{{ label }}</label>
+        <input type="{{ 'password' if secret else 'text' }}" id="{{ panel.name }}_{{ field }}" name="{{ field }}"
+               value="{{ panel.masked[field] if not secret else '' }}"
+               placeholder="{{ '••••••••  (saved — leave blank to keep)' if (secret and panel.masked[field]) else 'Paste value' }}" autocomplete="off">
+        {% if panel.field_help.get(field) %}<p class="form-note">{{ panel.field_help[field] }}</p>{% endif %}
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="btn-row" style="margin-top:1.1rem">
+      <button class="btn btn-sm btn-dark" type="submit">Save {{ panel.title }}</button>
+      <button class="btn btn-sm btn-ghost" type="submit" formaction="/settings/pg/{{ panel.name }}/test" formnovalidate>Test {{ panel.title }}</button>
+    </div>
+    <p class="form-note" style="margin-top:.5rem">Leave secret fields blank to keep saved credentials.</p>
+
+  </form>
+  {% endfor %}
+
+  <div class="card callout" style="margin-top:1.25rem">
+    <h3 class="section-title">How GPay, PhonePe and Paytm work here</h3>
+    <p>Direct UPI payments go to your configured recipient. Gateway payments use your provider account.</p>
+  </div>
+
+  <div class="card callout" style="margin-top:1.25rem;border-color:rgba(139,92,246,.4);background:rgba(139,92,246,.07)">
+    <h3 class="section-title">How credentials are protected</h3>
+    <p class="small" style="margin:0">Gmail app passwords, BharatPe tokens and gateway API secrets are encrypted with <strong>Fernet (AES-128-CBC + HMAC-SHA256)</strong> at rest, stored only in your self-hosted instance's database, and decrypted in memory solely to talk to the provider. They are never returned by any API endpoint or rendered back into pages. Rotate keys anytime in the provider's dashboard.</p>
+  </div>
+</div>
+{% endblock %}

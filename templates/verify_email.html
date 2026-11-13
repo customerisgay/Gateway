@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Verify your email — Godpay
+<script>
+(function () {
+  var form = document.querySelector('form[action="/verify-email"]');
+  if (!form) return;
+  var cells = Array.prototype.slice.call(form.querySelectorAll('.otp-cells input'));
+  var hidden = form.querySelector('#otp');
+  function sync() {
+    hidden.value = cells.map(function (c) { return c.value; }).join('');
+    cells.forEach(function (c) { c.classList.toggle('filled', /^[0-9]$/.test(c.value)); });
+  }
+  cells.forEach(function (cell, i) {
+    cell.addEventListener('input', function () {
+      cell.value = cell.value.replace(/\D/g, '').slice(0, 1);
+      if (cell.value && i < cells.length - 1) cells[i + 1].focus();
+      sync();
+    });
+    cell.addEventListener('keydown', function (e) {
+      if (e.key === 'Backspace' && !cell.value && i > 0) { cells[i - 1].focus(); cells[i - 1].value = ''; sync(); e.preventDefault(); }
+      if (e.key === 'ArrowLeft' && i > 0) cells[i - 1].focus();
+      if (e.key === 'ArrowRight' && i < cells.length - 1) cells[i + 1].focus();
+    });
+    cell.addEventListener('paste', function (e) {
+      e.preventDefault();
+      var digits = ((e.clipboardData || window.clipboardData).getData('text') || '').replace(/\D/g, '').slice(0, 6).split('');
+      digits.forEach(function (d, j) { if (cells[j]) cells[j].value = d; });
+      cells[Math.min(digits.length, cells.length - 1)].focus();
+      sync();
+    });
+  });
+  form.addEventListener('submit', function (e) {
+    sync();
+    if (!/^[0-9]{6}$/.test(hidden.value)) { e.preventDefault(); cells[0].focus(); }
+  });
+})();
+</script>
+{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="card auth-card">
+    <h1>Check your inbox</h1>
+    <p class="muted small">We sent a 6-digit verification code to <strong>{{ email }}</strong>. It expires in 15 minutes.</p>
+
+    {% if info %}
+    <div class="dev-otp" style="border-color:rgba(125,211,252,.4);background:rgba(56,189,248,.07);color:#bfe3ff">{{ info }}</div>
+    {% elif dev_otp %}
+    <div class="dev-otp">
+      SMTP is <u>not configured</u> on this server, so the email couldn't be sent.<br>
+      Dev-mode code (shown only because mail isn't set up):<br>
+      <span style="font-size:1.5rem;letter-spacing:.4em">{{ dev_otp }}</span><br>
+      <span class="small" style="font-weight:600">Set SMTP_HOST / SMTP_USER / SMTP_PASS in .env to send real emails.</span>
+    </div>
+    {% elif detail %}
+    <div class="dev-otp" style="border-color:rgba(248,113,113,.45);background:var(--bad-soft);color:var(--bad)">Email failed: {{ detail }}</div>
+    {% else %}
+    <div class="flash ok" style="margin:.8rem 0">Email sent — check your inbox (and spam).</div>
+    {% endif %}
+
+    <form method="post" action="/verify-email">
+      <input type="hidden" name="email" value="{{ email }}">
+      <label class="flabel" id="otp-label">Verification code</label>
+      <input type="hidden" name="otp" id="otp">
+      <div class="otp-cells" role="group" aria-labelledby="otp-label">
+        <input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Digit 1" autofocus>
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6">
+      </div>
+      <button class="btn btn-auth btn-shine" type="submit" style="width:100%;justify-content:center;margin-top:1.1rem">Verify &amp; continue <span class="btn-arrow">→</span></button>
+    </form>
+
+    <form method="post" action="/verify-email/resend" style="margin-top:.7rem;text-align:center">
+      <input type="hidden" name="email" value="{{ email }}">
+      <button class="btn btn-ghost btn-sm" type="submit">Resend code</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

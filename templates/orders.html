@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Orders — Godpay{% endblock %}
+{% block content %}
+
+<div class="container page">
+  <div class="page-head">
+    <div>
+      <h1>Orders</h1>
+      <p>{{ counts.get('PAID', 0) }} paid · {{ counts.get('PENDING', 0) }} pending · {{ counts.get('EXPIRED', 0) }} expired · {{ counts.get('CANCELLED', 0) }} cancelled</p>
+    </div>
+    <div class="btn-row">
+      <a class="btn btn-sm {{ 'btn-dark' if not status_filter else 'btn-ghost' }}" href="/orders">All</a>
+      <a class="btn btn-sm {{ 'btn-dark' if status_filter == 'PENDING' else 'btn-ghost' }}" href="/orders?status=PENDING">Pending</a>
+      <a class="btn btn-sm {{ 'btn-dark' if status_filter == 'PAID' else 'btn-ghost' }}" href="/orders?status=PAID">Paid</a>
+      <a class="btn btn-sm btn-ghost" href="/orders?status=CANCELLED">Cancelled</a>
+      <a class="btn btn-sm {{ 'btn-dark' if status_filter == 'EXPIRED' else 'btn-ghost' }}" href="/orders?status=EXPIRED">Expired</a>
+    </div>
+  </div>
+
+  {% if orders %}
+  <div class="table-wrap" style="margin-top:1rem">
+    <table>
+      <thead><tr><th>Order</th><th>Client ref</th><th>Provider</th><th>Base</th><th>Exact</th><th>Status</th><th>UTR</th><th>Customer</th><th>Created</th><th>Action</th></tr></thead>
+      <tbody>
+      {% for o in orders %}
+        <tr>
+          <td class="mono"><a href="/pay/{{ o.id }}" style="text-decoration:none">{{ o.id }}</a></td>
+          <td class="small">{{ o.client_ref or '—' }}</td>
+          <td class="small">{{ provider_title(o.provider) }}</td>
+          <td>₹{{ '%.2f'|format(o.base_amount) }}</td>
+          <td class="mono">₹{{ '%.2f'|format(o.exact_amount) }}</td>
+          <td><span class="pill {{ o.status.lower() }}">{{ o.status }}</span></td>
+          <td class="mono small">{{ o.utr[:16] if o.utr else '—' }}</td>
+          <td class="small">{{ o.customer_name or o.customer_email or '—' }}</td>
+          <td class="small">{{ o.created_at | dt }}</td><td>{% if o.status == 'PENDING' %}<form method="post" action="/orders/{{ o.id }}/cancel" onsubmit="return confirm('Cancel this payment? This does not reverse a transfer already sent.')"><input type="hidden" name="csrf_token" value="{{ manual_csrf }}"><button type="submit" class="btn btn-sm btn-ghost">Cancel</button></form>{% endif %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty" style="margin-top:1.5rem">Nothing here yet{% if status_filter %} with status {{ status_filter }}{% endif %}. <a href="/docs#create">Create your first order via the API →</a></div>
+  {% endif %}
+</div>
+{% endblock %}

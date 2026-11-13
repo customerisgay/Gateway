@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block title %}Godpay — Accept every UPI app. 0% fees on direct rails.{% endblock %}
+{% block content %}
+
+<div class="container studio-hero">
+ <div><div class="studio-kicker">PAYMENTS, WITHOUT THE FRICTION</div><h1>Your money.<br>Your account.<br><em>Every UPI app.</em></h1><p class="lead">Collect UPI payments with dynamic QR codes, payment verification and a merchant dashboard.</p><div class="hero-actions"><a class="btn join-now" href="/signup">Join now <span class="btn-arrow">↗</span></a><a class="btn btn-ghost" href="/docs">Explore the API →</a></div></div>
+ <div class="demo-window" aria-label="Illustrative checkout preview — not live payment data"><div class="demo-top"><span class="micro">YOUR NEXT COLLECTION</span><span class="demo-caption"><i></i> CHECKOUT PREVIEW</span></div><div class="demo-total">₹100<small>.42</small></div><div class="demo-split"><div class="demo-qr"><b>Scan. Pay. Done.</b><img src="/static/qr-sample.png" alt="Decorative example QR — not a payment request" width="116" height="116"><small>ONE QR · ANY UPI APP</small></div><div class="demo-feed"><h4>Payment details</h4><p><span>Verification</span><b>Automatic</b></p><p><span>Platform fee</span><b>₹0.00</b></p><p><span>Settlement</span><b>Direct UPI</b></p><div class="demo-bar" aria-hidden="true"><i style="height:20%"></i><i style="height:40%"></i><i style="height:32%"></i><i style="height:57%"></i><i style="height:45%"></i><i style="height:70%"></i><i style="height:58%"></i><i style="height:80%"></i><i style="height:67%"></i><i style="height:91%"></i><i style="height:85%"></i><i style="height:100%"></i></div></div></div><div class="demo-bottom"><span>Encrypted credentials. Signed webhooks.</span><span>Godpay ↗</span></div></div>
+</div>
+<section class="gallery-section" aria-label="Supported UPI apps"><div class="gallery-title">Pay with any UPI app.</div><div class="app-orbit"><div class="app-orbit-inner"><div class="app-tile" style="--i:0"><b>G</b><span>Google Pay</span></div><div class="app-tile" style="--i:1"><b>पे</b><span>PhonePe</span></div><div class="app-tile" style="--i:2"><b>P</b><span>Paytm</span></div><div class="app-tile" style="--i:3"><b>B</b><span>BHIM</span></div><div class="app-tile" style="--i:4"><b>M</b><span>MobiKwik</span></div><div class="app-tile" style="--i:5"><b>W</b><span>WhatsApp Pay</span></div><div class="app-tile" style="--i:6"><b>a</b><span>Amazon Pay</span></div><div class="app-tile" style="--i:7"><b>F</b><span>FamPay</span></div></div></div><p class="small muted">UPI-compatible payer apps · verification depends on your configured payment provider</p></section>
+<hr class="beam">
+
+<section class="section"><div class="container two-col"><div><span class="eyebrow">YOUR STACK, YOUR CHOICE</span><h2 class="section-title">Three ways. One gateway.</h2><div class="feature-switcher" aria-label="Payment rail features"><button type="button" data-feature="direct" aria-pressed="true">01 · Direct UPI</button><button type="button" data-feature="gateway" aria-pressed="false">02 · Gateways</button><button type="button" data-feature="developer" aria-pressed="false">03 · Developer</button></div><p class="feature-description" id="featureDescription" aria-live="polite">Connect FamPay email verification or your BharatPe merchant feed. Customers scan one QR; collections settle to your own account.</p></div><div class="api-spec"><span class="eyebrow">BUILT FOR DEVELOPERS</span><h3>Payment API.<br>One API call away.</h3><ul><li>REST + JSON · API-key authentication</li><li>Dynamic QR and hosted checkout</li><li>Signed payment.verified webhooks</li><li>Order status and UTR verification</li></ul><code>POST /api/v1/order/create</code><div style="margin-top:20px"><a class="btn" href="/docs">Read API specifications ↗</a></div></div></div></section>
+<!-- ============ BENTO FEATURES ============ -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">The rails, wired in</span>
+      <h2 class="section-title">One integration. Every Indian payment rail.</h2>
+      <p>Choose a supported provider for payment verification.</p>
+    </div>
+
+    <div class="bento">
+      <div class="card-cell wide spot">
+        <div class="icon-chip"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m3 6 9 6 9-6"/></svg></div>
+        <h3>FamPay verification, over email</h3>
+        <p>FamPay has no public merchant API — so Godpay watches your registered Gmail via <strong>IMAP</strong>, spots the payment-confirmation email, extracts the UTR and settles the order. <strong>0% fee, no KYC.</strong></p>
+      </div>
+
+      <div class="card-cell wide spot">
+        <div class="icon-chip"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M12 9h.01"/></svg></div>
+        <h3>BharatPe merchant feed</h3>
+        <p>Paste your <strong>Merchant ID + API token</strong>. We poll the BharatPe enterprise feed every few seconds and match SUCCESS transactions by exact amount + UTR.</p>
+      </div>
+
+      <div class="card-cell wide spot">
+        <div class="icon-chip"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3m-6 4 3 3 3-3M12 12v9"/><path d="M9 3h6v4H9z"/></svg></div>
+        <h3>Official gateways, your keys</h3>
+        <p>Prefer full-service? <strong>Razorpay, PhonePe, Paytm, Cashfree, MobiKwik (Zaakpay)</strong> — hosted checkouts with cards + netbanking, settled via each provider's signed webhook into the same orders pipeline.</p>
+      </div>
+
+      <div class="card-cell spot">
+        <div class="icon-chip"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM21 14h.01M14 21h.01M18 18h3v3h-3z"/></svg></div>
+        <h3>Hosted checkout QR</h3>
+        <p>Hosted checkout includes a QR code, UPI app links and verified payment status.</p>
+      </div>
+
+      <div class="card-cell spot">
+        <div class="icon-chip"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3 7 21M17 3l-2 18M4 8h17M3 13h17M2 18h17"/></svg></div>
+        <h3>Collision-free amounts</h3>
+        <p>Optional paise offsets help distinguish pending payments.</p>
+      </div>
+
+      <div class="card-cell spot">
+        <div class="icon-chip"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.4 9.4 8 10 4.6-.6 8-5 8-10V6l-8-4z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <h3>Anti-fraud by design</h3>
+        <p>Global UTR de-duplication, SSRF-guarded webhooks, Encrypted-at-rest credential vault, per-key rate limits.</p>
+      </div>
+
+      <div class="card-cell spot">
+        <div class="icon-chip"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></div>
+        <h3>HMAC-signed webhooks</h3>
+        <p><code class="inline">payment.verified</code> POSTed the moment money lands — verify <code class="inline">X-FamGate-Signature</code>, get delivery logs &amp; retries.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="beam">
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="section section-alt" id="how">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">From zero to checkout</span>
+      <h2 class="section-title">Three steps to go live</h2>
+      <p>Connect your existing merchant account.</p>
+    </div>
+    <div class="steps">
+      <div class="step spot">
+        <div class="step-n">1</div>
+        <h3>Connect your rail</h3>
+        <p>FamPay (Gmail App Password) or BharatPe (Merchant ID + token) for 0% rails — or official gateway keys. Encrypted (Fernet) at rest.</p>
+      </div>
+      <div class="step spot">
+        <div class="step-n">2</div>
+        <h3>Generate your API key</h3>
+        <p>One click creates your <code class="inline">fp_live_</code> key. Drop it into your site, bot or app — full REST API with signed webhooks.</p>
+      </div>
+      <div class="step spot">
+        <div class="step-n">3</div>
+        <h3>Create an order, get paid</h3>
+        <p><code class="inline">POST /api/v1/order/create</code> returns a QR + payment link. Customer pays; Godpay auto-verifies and marks it paid.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section class="section" id="pricing">
+  <div class="container">
+    <div class="section-head center" style="margin-inline:auto">
+      <span class="eyebrow" style="justify-content:center">Pricing</span>
+      <h2 class="section-title">₹0 to Godpay. Money goes to you.</h2>
+      <p>Godpay never holds or routes funds — we're verification infrastructure, not an aggregator.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="eyebrow" style="margin-bottom:.3rem">Direct rails</div>
+        <h3 style="font-size:1.1rem">FamPay + BharatPe</h3>
+        <div class="price">₹0<small> / forever</small></div>
+        <ul class="price-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Unlimited orders &amp; keys</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>FamPay IMAP + BharatPe feed verification</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Hosted checkout + dynamic QR</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Signed webhooks + delivery logs</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Use your own merchant account</li>
+        </ul>
+        <a class="btn btn-shine" style="width:100%;justify-content:center" href="/signup">Start on direct rails <span class="btn-arrow">→</span></a>
+      </div>
+      <div class="price-card hot glow-border">
+        <div class="eyebrow" style="margin-bottom:.3rem">Official gateways</div>
+        <h3 style="font-size:1.1rem">Razorpay · PhonePe · Paytm · Cashfree · MobiKwik</h3>
+        <div class="price">₹0<small> to Godpay</small></div>
+        <ul class="price-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Everything in Direct rails</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Hosted checkout with cards + netbanking</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Full-service onboarding handled by the gateway</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Same dashboard, webhooks and REST API</li>
+          <li class="note">You pay the gateway's own standard fee (MDR) — Godpay adds nothing on top.</li>
+        </ul>
+        <a class="btn btn-ghost" style="width:100%;justify-content:center" href="/docs">Read the PG setup →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="section section-alt faq">
+  <div class="container" style="max-width:880px">
+    <div class="section-head">
+      <span class="eyebrow">Honest answers</span>
+      <h2 class="section-title">Frequently asked questions</h2>
+    </div>
+    <details><summary>Does FamPay have an official merchant API?</summary><p>No. FamPay is a consumer wallet and does not publish a public merchant collection API. Godpay verifies FamPay payments the way the ecosystem does — by reading the payment confirmation email your FamPay-linked Gmail receives, over IMAP, using a revocable 16-character Google App Password.</p></details>
+    <details><summary>Does GPay have a merchant API?</summary><p>No. Google Pay has no public merchant collection API for third parties. GPay is a payer app — it works through every rail here: UPI (any QR / deep link) and inside Razorpay / PhonePe / Paytm / Cashfree / MobiKwik checkouts.</p></details>
+    <details><summary>Can I use official gateways instead?</summary><p>Yes — bring your own merchant account and keys, paste them in Dashboard → Payments, and Godpay creates the payment, verifies the signed webhook, settles the order and fires your webhook. Same orders dashboard and REST API, no integration changes.</p></details>
+    <details><summary>How does BharatPe verification work?</summary><p>BharatPe's enterprise dashboard exposes a transaction feed merchants use to see QR collections. With your BharatPe Merchant ID and API token, Godpay polls that feed, matches the SUCCESS transaction to the pending order by its unique exact amount and UTR, and settles it.</p></details>
+    <details><summary>Where does the money go?</summary><p>Directly to the UPI VPA / bank account linked to your FamPay or BharatPe merchant account. Godpay never holds, pools or routes funds — we are verification infrastructure, not a payment aggregator.</p></details>
+    <details><summary>What is the decimal offset, and can we turn it off?</summary><p>To match payments without the customer typing a UTR, each order is quoted at a unique paise amount (e.g. ₹250 → ₹250.17). Toggle it off in Dashboard → Payments if you prefer exact amounts with manual UTR verification.</p></details>
+    <details><summary>Is this legal for my business?</summary><p>Godpay is a self-hosted tool for your own merchant accounts. You're responsible for complying with RBI/NPCI rules, FamPay &amp; BharatPe terms of service, GST and KYC for your merchant account. Don't use it to process payments for third parties or unlawful goods.</p></details>
+    <details><summary>What happens if verification breaks?</summary><p>Orders stay PENDING until the payment window expires. You can use “Verify by UTR” on the checkout page as a manual fallback — your webhook never fires before verification succeeds. Confirm receipt before fulfilment.</p></details>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section class="section" style="padding-top:2.5rem">
+  <div class="container center">
+    <h2 class="section-title">Start collecting in the next 5 minutes.</h2>
+    <p class="lead" style="margin-inline:auto;margin-bottom:1.4rem">Sign up → connect your payment provider → copy your API key.</p>
+    <a class="btn btn-shine" style="font-size:1rem;padding:.9rem 2.2rem" href="/signup">Create my free gateway<span class="btn-arrow">→</span></a>
+  </div>
+</section>
+{% endblock %}
+
+<script>
+(function(){
+  // Particle constellation (hero)
+  var c = document.getElementById('netCanvas');
+  if (c && c.getContext && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+    var ctx = c.getContext('2d');
+    var hero = c.closest('.hero');
+    var W = 0, H = 0, pts = [];
+    function resize(){
+      W = hero.offsetWidth; H = hero.offsetHeight;
+      var dpr = Math.min(2, window.devicePixelRatio || 1);
+      c.width = W * dpr; c.height = H * dpr; c.style.width = W + 'px'; c.style.height = H + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var n = Math.max(22, Math.floor(W / 26));
+      pts = [];
+      for (var i = 0; i < n; i++) pts.push({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .42, vy: (Math.random() - .5) * .42, r: 1 + Math.random() * 1.5 });
+    }
+    resize(); window.addEventListener('resize', resize);
+    (function frame(){
+      ctx.clearRect(0, 0, W, H);
+      for (var i = 0; i < pts.length; i++) {
+        var p = pts[i]; p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > W) p.vx *= -1; if (p.y < 0 || p.y > H) p.vy *= -1;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832); ctx.fillStyle = 'rgba(125, 211, 252, .5)'; ctx.fill();
+      }
+      for (var i = 0; i < pts.length; i++) for (var j = i + 1; j < pts.length; j++) {
+        var dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y, d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 110) { ctx.strokeStyle = 'rgba(96, 165, 250,' + (0.3 * (1 - d / 110)) + ')'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y); ctx.stroke(); }
+      }
+      requestAnimationFrame(frame);
+    })();
+  }
+  // Spotlight cards: track pointer for the radial highlight
+  var spots = document.querySelectorAll('.spot');
+  for (var i = 0; i < spots.length; i++) {
+    spots[i].addEventListener('pointermove', function(e){
+      var r = this.getBoundingClientRect();
+      this.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+      this.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+    });
+  }
+})();
+</script>

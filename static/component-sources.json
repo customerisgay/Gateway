@@ -1,0 +1,149 @@
+[
+  {
+    "component": "payment-button",
+    "original": "https://uiverse.io/fthisilak/bitter-termite-36",
+    "sha256_html": "f202476715dcdee8e79141cec1e7ae6a9a01c5de572490fbe049294f09bca0a7",
+    "sha256_css": "fef4f113cea8df7a87e6e0fb09d282618fc69224e000c0fe28fc846552c62056",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "processing",
+    "original": "https://uiverse.io/bociKond/green-mayfly-76",
+    "sha256_html": "172e18219dbd3355066daf4a86618ae918ed199af26bb2a7abeb91fd197b746d",
+    "sha256_css": "185425ddaba5e225480292ae6d30fb0e137972456460326ca945a8fc50077feb",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "apps",
+    "original": "https://uiverse.io/ilkhoeri/swift-panda-38",
+    "sha256_html": "74b51a418eb9ddc9e2e968190d66b5c5dc518fc485bb56d77a2cf66a1307b187",
+    "sha256_css": "7eb992a0e65b950b49075ce68332e29813a5ed0760cfca1a2e4ff0144b3d76c8",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "qr-loader",
+    "original": "https://uiverse.io/mobinkakei/grumpy-turtle-41",
+    "sha256_html": "0fb83d3752bf7cbe8e8ba0839169dcb4074456d562cabd5948917a7df2674b5b",
+    "sha256_css": "dc42cf0f5b01de12d7de7928bbb89cb9f912c3fce39ed7ed376e50cfdeed5730",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "receipt",
+    "original": "https://uiverse.io/zeeshan_2112/shy-rattlesnake-3",
+    "sha256_html": "ed17a67d151c60e60de604c023e183354f987fca9ae521c35871dbb0604ad5b6",
+    "sha256_css": "464f968d945c6b281d7a54c6d3986bb27f64101491d2eb6c026c1dd4ea04ad8c",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "download",
+    "original": "https://uiverse.io/adamgiebl/plastic-parrot-32",
+    "sha256_html": "b86baa78f44cd2b63a70c7f2046699e881d90b78b1d0baa7769541de07116648",
+    "sha256_css": "2d48c5f638df062caebeb3fb9abbc6809a183fbbfa6a34e1b1a3e2f35d8ff2c6",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "privacy",
+    "original": "https://uiverse.io/ilkhoeri/thin-bobcat-83",
+    "sha256_html": "08f06c6a4da853a794745b6bc761291284a41af5522c0dd2a43de16d9837feb8",
+    "sha256_css": "2d7751c6aa718a7095a1b89d304e007d3154cce7a5099b9c6478a61cd4081618",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "api-card",
+    "original": "https://uiverse.io/MuhammadHasann/fast-badger-70",
+    "sha256_html": "c27b2f0f116d4f7228d43a755960c664d642636808b9e2cbb761035d0087374f",
+    "sha256_css": "895c5c1a1d892e72f7f9c48d0f5e46e3d3d8ab4deb69a3fa2503b405628dc47e",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "amount",
+    "original": "https://uiverse.io/byllzz/rude-bat-50",
+    "sha256_html": "a9d811446e84caef13e15c0ecf6d1b35d3b63e05b9f0077bd877b1ae8fa9120d",
+    "sha256_css": "2e9fbc2f83f11476e999672f8756aebe749b1e24a85abb8a847d949972efa582",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "contact",
+    "original": "https://uiverse.io/david-mohseni/brave-shrimp-86",
+    "sha256_html": "c83cd084a528a61768af23591b4ef820c7fa45c0835ec6f125fdcb5b364cc915",
+    "sha256_css": "29d3ecb838b468417d69c734e685c2b7475bb9216a4c04fd3665a8fabecd28c4",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "qr-card",
+    "original": "https://uiverse.io/uiverse-astronaut/jolly-parrot-30",
+    "sha256_html": "9b5ca3be80bd534b8c7bbfe1e123391021cf0bcf0ed46cdf0316053971737430",
+    "sha256_css": "e79539656ad5b83882743f7a1b84ed49c8c047d3edea763621dc44d999863b78",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "feedback",
+    "original": "https://uiverse.io/SelfMadeSystem/selfish-starfish-40",
+    "sha256_html": "29ff87664f059426183ba9c9bbf29a8da7eb7e2d974a0a6aeb1f75ec14c1ab55",
+    "sha256_css": "def708cf0c529258acd339782cbda6bb80c4cf12a68b34fe068ba5ba2418e27c",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "features",
+    "original": "https://uiverse.io/byllzz/little-wombat-0",
+    "sha256_html": "208082d25a39dc66945c41766393ec35b1d4dbc84b0f9094c1cd1c73a67e92d6",
+    "sha256_css": "586aad1bd1fd260da353e3ee6da4e12b3d27c130e99b670d3501dfce4ad44e9b",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "auth",
+    "original": "https://uiverse.io/akshat-patel28/rare-cobra-61",
+    "sha256_html": "1cff89ac343fb73ad3beb45255a48889c6236fe5b98da2cce8d15edfd70e1e97",
+    "sha256_css": "cb8e668c37dbe0983bd4c3bb779cef70f3e66643b804e5dbcfe57ca4c768aa78",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "input",
+    "original": "https://uiverse.io/Alanav29/tough-ape-65",
+    "sha256_html": "f931076a0f758db2a5838aa6c5f723770305fccace29957cd050f7a23e2678e1",
+    "sha256_css": "49c9ab5b1411a56533b17aa05e0dc2c6d2fdc638b356be1550bcbaa0ed11d59d",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "share",
+    "original": "https://uiverse.io/Mohammad-Rahme-576/hard-starfish-64",
+    "sha256_html": "0daa5823832f1dc5dfd033acf455c0edb28f86d97835e7c5565741ac61accc1e",
+    "sha256_css": "5623caeb07175f401067350cfae0c031c03fa27b35f9ca784b64db88bf88a923",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "join",
+    "original": "https://uiverse.io/marcelodolza/stupid-vampirebat-24",
+    "sha256_html": "136e1a88330de85f5859e8d14414ed42bbbf71643294c30ba3a6fddab9dbd239",
+    "sha256_css": "6938cccef868c5375929473a68bda34b3a7740e976c0fef810490f00f8aa5030",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "print",
+    "original": "https://uiverse.io/marcelodolza/fluffy-panda-74",
+    "sha256_html": "96a21871f7d8a274959cd006979c149336610fb9b304222b98de8ae1d6035185",
+    "sha256_css": "90fc5f03742f2bb22b30d9ad8787adfd18d3742d823afdb7cba0854ee9c5d01e",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "status",
+    "original": "https://uiverse.io/marcelodolza/massive-panda-16",
+    "sha256_html": "a6154d3ee2ad18c8e0962fc431088eefcaddf7dbf51c15fa6f4b9288e7a8e014",
+    "sha256_css": "5b25a967a9aab7cbe8f0056a0891de1080cc80d5adc7704a339c8ee4970a694a",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "message",
+    "original": "https://uiverse.io/Lakshay-art/polite-tiger-43",
+    "sha256_html": "f3db622a9f4cc0dbd27b05159e8511c3b842ebe88ba3a7b1009bb1985b5461a3",
+    "sha256_css": "c9ed41530a1af3c210fab878b65f698bc8412b2af7be87339c5b0e536827a893",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  },
+  {
+    "component": "pdf",
+    "original": "https://uiverse.io/dexter-st/friendly-cow-59",
+    "sha256_html": "001aac62ba74a4318da96a4a21415b027c3ca0e8075392984e2942b1333b50a6",
+    "sha256_css": "235613da33b09ccc95c860155784f6d5596487dbd1a3e73f22827ae8007c3cd3",
+    "adaptations": "Isolated original markup/styles; blue hue mapping, Godpay data/actions, responsive containment, accessibility. No changes to animation keyframes or original durations."
+  }
+]

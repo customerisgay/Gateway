@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Records — Admin — Godpay{% endblock %}
+{% block content %}
+{% include "_adminnav.html" %}
+<div class="container page">
+  <div class="page-head">
+    <div>
+      <h1>Records <span class="muted" style="font-size:.55em;font-weight:500">· {{ total }} orders</span></h1>
+      <p>Every order on this instance — read-only except expiring stale PENDING orders.</p>
+    </div>
+  </div>
+
+  <form method="get" action="/admin/orders" class="admin-filters">
+    <div class="chip-row">
+      {% set statuses = [('', 'All'), ('PAID', 'Paid'), ('PENDING', 'Pending'), ('EXPIRED', 'Expired'), ('FAILED', 'Failed')] %}
+      {% for key, label in statuses %}
+        <a class="chip {% if status == key %}chip-on{% endif %}" href="/admin/orders?status={{ key }}&provider={{ provider }}&q={{ q }}">{{ label }}{% if key %} · {{ counts.get(key, 0) }}{% endif %}</a>
+      {% endfor %}
+    </div>
+    <div class="filter-inline">
+      <select name="provider" onchange="this.form.submit()">
+        <option value="">All providers</option>
+        {% for p in ['fampay','bharatpe','razorpay','phonepe','paytm','cashfree','mobikwik'] %}<option value="{{ p }}" {% if provider == p %}selected{% endif %}>{{ p }}</option>{% endfor %}
+      </select>
+      <input type="text" name="q" value="{{ q }}" placeholder="Search order id, email, UTR, client ref…">
+      <input type="hidden" name="status" value="{{ status }}">
+      <button class="btn btn-sm" type="submit">Apply</button>
+    </div>
+  </form>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Order</th><th>Merchant</th><th>Provider</th><th>₹ (exact)</th><th>Status</th><th>When</th><th>UTR</th><th></th></tr></thead>
+      <tbody>
+        {% for o in orders %}
+        <tr>
+          <td class="mono small">{{ o.id[:14] }}…</td>
+          <td class="small">{{ o.merchant_email }}</td>
+          <td class="small">{{ o.provider }}</td>
+          <td>{{ '%.2f'|format(o.exact_amount) }}</td>
+          <td><span class="pill {{ 'paid' if o.status == 'PAID' else ('pending' if o.status == 'PENDING' else 'expired') }}">{{ o.status }}</span></td>
+          <td class="small">{{ o.created_at | dt }}</td>
+          <td class="mono small">{{ (o.utr or '—')[:15] }}</td>
+          <td>{% if o.status == 'PENDING' %}<form method="post" action="/admin/orders/{{ o.id }}/expire" onsubmit="return confirm('Expire stale order {{ o.id }}?')" style="display:inline"><button class="btn btn-sm btn-danger" type="submit">Expire</button></form>{% endif %}</td>
+        </tr>
+        {% else %}<tr><td colspan="8" class="empty">No orders match those filters.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="admin-pager">
+    {% if page > 1 %}<a class="btn btn-sm btn-ghost" href="/admin/orders?status={{ status }}&provider={{ provider }}&q={{ q }}&page={{ page - 1 }}">← Prev</a>{% endif %}
+    <span class="small muted">Page {{ page }} of {{ pages }}</span>
+    {% if page < pages %}<a class="btn btn-sm btn-ghost" href="/admin/orders?status={{ status }}&provider={{ provider }}&q={{ q }}&page={{ page + 1 }}">Next →</a>{% endif %}
+  </div>
+</div>
+{% endblock %}

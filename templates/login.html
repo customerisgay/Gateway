@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Log in to Godpay{% endblock %}
+{% block content %}
+<div class="auth-split">
+  <aside class="auth-visual" aria-hidden="true">
+    <div class="auth-visual-tag">Auto-verified UPI rails</div>
+    <h2>Money lands in <em>your</em> account — never anywhere else.</h2>
+    <ul>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.2 5.2L20 6.8"/></svg><span><b>≈3-second</b> payment detection via official FamPay IMAP &amp; BharatPe merchant feed</span></li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.2 5.2L20 6.8"/></svg><span><b>₹0 to Godpay</b> — UPI collections, no MDR, no platform fee, ever</span></li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.2 5.2L20 6.8"/></svg><span><b>Fernet-encrypted</b> keys at rest · HMAC-signed webhooks · replay-safe</span></li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.2 5.2L20 6.8"/></svg><span><b>Razorpay · PhonePe · Paytm · Cashfree · MobiKwik</b> — bring your own keys</span></li>
+    </ul>
+    <div class="auth-visual-tag" style="color:#a7f3d0;border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.07)">Self-hosted · keys never leave your server</div>
+  </aside>
+  <form class="card auth-card" method="post" action="/login">
+    <h1>Log in</h1>
+    <p class="muted small">Access your account.</p>
+
+    <label class="flabel" for="email">Email</label>
+    <input type="email" id="email" name="email" placeholder="you@example.com" required maxlength="160" autofocus>
+
+    <label class="flabel" for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="••••••••••" required autocomplete="current-password">
+
+    <div class="btn-row" style="margin-top:1.2rem">
+      <button class="btn btn-shine btn-auth" type="submit" style="flex:1;justify-content:center">Log in <span class="btn-arrow">→</span></button>
+    </div>
+    <p class="alt">New here? <a href="/signup"><strong>Create a free account</strong></a></p>
+  </form>
+</div>
+{% endblock %}

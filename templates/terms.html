@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Terms of Service — Godpay{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="terms">
+    <span class="eyebrow">Legal · last updated Nov 2026</span>
+    <h1>Terms of Service</h1>
+    <p class="muted">Godpay is self-hosted verification infrastructure for merchants collecting their own UPI payments and, optionally, their own accounts at full-service gateways. By using this site you agree to the following — written plainly, because we mean it.</p>
+
+    <h2>1. What Godpay is (and isn't)</h2>
+    <ul>
+      <li>Godpay watches <em>your</em> FamPay Gmail (IMAP), <em>your</em> BharatPe merchant feed, or <em>your</em> gateway webhooks, and tells you when a payment arrived.</li>
+      <li>Godpay never holds, pools, routes or settles funds. Money moves directly between the payer and your own UPI ID / bank / gateway account.</li>
+      <li>Godpay is not a payment aggregator, bank, wallet, NBFC or escrow. It is accounting-adjacent software that runs on this server.</li>
+    </ul>
+
+    <h2>2. Your responsibilities</h2>
+    <ul>
+      <li>You are responsible for complying with RBI/NPCI rules, UPI terms, FamPay/BharatPe/gateway terms of service, GST, KYC and taxation for payments you collect.</li>
+      <li>Do not use Godpay to process payments for third parties, fictitious goods, unlawful goods or services, or to evade law enforcement.</li>
+      <li>Keep your API secrets, OTP codes and Gmail App Passwords private. Anyone with your secret can call your endpoints; anyone with your App Password can read your mailbox.</li>
+      <li>You are responsible for the security of the server this instance runs on.</li>
+    </ul>
+
+    <h2>3. Accuracy of verification</h2>
+    <p>Verification matches a payment by exact amount (to the paise) and/or UTR, as configured. Automated verification can be wrong or late — emails can arrive delayed or not at all, BharatPe's feed can lag, gateway webhooks can be retried or replayed, and payer apps can fail silently. Never release goods or services without confirming payment settled in your own account when the stakes justify it. Your orders dashboard shows the evidence Godpay used; "Verify by UTR" is always available.</p>
+
+    <h2>4. No warranty, no liability</h2>
+    <p>Godpay is provided "as is", without warranties of any kind. To the maximum extent permitted by law, this server's operator and the Godpay authors are not liable for lost revenue, double-fulfilment, failed collections, chargebacks, regulatory action, account suspension by your bank/gateway, or data loss. If that's unacceptable, don't run payments you can't afford to lose.</p>
+
+    <h2>5. Your data</h2>
+    <p>Your credentials (Gmail App Passwords, tokens, gateway keys) are stored encrypted (Fernet — AES-128-CBC with HMAC-SHA256) on this server, and your data never leaves it. Order and webhook metadata stay on this server. You can delete your account and keys at any time; backups you or the operator take are yours to manage. We don't sell or share data — there's nothing to sell.</p>
+
+    <h2>6. Changes &amp; contact</h2>
+    <p>These terms may change as the product evolves; the version on this page is the one that applies. Questions: <a href="mailto:godhostings@gmail.com" style="color:var(--accent-2);font-weight:700">godhostings@gmail.com</a>.</p>
+  </div>
+</div>
+{% endblock %}

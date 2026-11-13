@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Godpay — 0%-fee UPI gateway &amp; official PG adapters{% endblock %}</title>
+<meta name="description" content="Accept FamPay and BharatPe UPI payments with 0% commission, or plug in Razorpay, PhonePe, Paytm, Cashfree or MobiKwik keys. Auto-verified, webhooks, developer REST API.">
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ asset_v }}">
+<meta name="theme-color" content="#287aff">
+<script>(function(){document.documentElement.dataset.theme='dark';})();</script>
+<link rel="stylesheet" href="/static/style.css?v={{ asset_v }}">
+<link rel="stylesheet" href="/static/studio.css?v=godpay-mobile-3">
+<style>.form-note,.pg-note{font-size:13px!important;line-height:1.6}.pill.cancelled{background:#40262e;color:#ffc7d1}.page-head h1,.merchant-ui .page-head h1{font-weight:700}#realPaymentForm label{font-weight:600}</style></head>
+<body class="{% if merchant %}merchant-ui{% else %}public-ui{% endif %}">
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="logo" href="/">
+      <span class="logo-mark">
+        <svg width="19" height="19" viewBox="0 0 64 64" fill="none"><path d="M37 8 L18 37 H31 L26 56 L46 27 H33 Z" stroke="#7cc4ff" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      </span>
+      Godpay
+    </a>
+    <button class="nav-burger" id="navBurger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <nav class="nav-links" id="navLinks">
+      <a href="/#features">Features</a>
+      <a href="/#how">How it works</a>
+      <a href="/#pricing">Pricing</a>
+      <a href="/guide">Guide</a>
+      <a href="/docs">API Docs</a>
+      {% if merchant %}
+      <a href="/dashboard" class="mobile-only">Dashboard</a>
+      {% if is_admin %}<a href="/admin" class="mobile-only">Admin console</a>{% endif %}
+      {% else %}
+      <a href="/login" class="mobile-only">Log in</a>
+      <a href="/signup" class="mobile-only">Start free</a>
+      {% endif %}
+    </nav>
+    <div class="nav-cta">
+      {% if merchant %}
+        {% if is_admin %}<a class="btn btn-sm btn-ghost" href="/admin" style="letter-spacing:.08em;font-weight:800">ADMIN</a>{% endif %}
+        <a class="btn btn-sm btn-dark" href="/dashboard">Dashboard →</a>
+      {% else %}
+        <a class="btn btn-sm btn-ghost" href="/login" style="margin-right:.4rem">Log in</a>
+        <a class="btn btn-sm btn-shine" href="/signup">Start free</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+{% if merchant %}{% include "_appnav.html" %}{% endif %}
+<main>
+  <div class="container">
+    {% if ok %}<div class="flash ok">{{ ok }}</div>{% endif %}
+    {% if err %}<div class="flash err">{{ err }}</div>{% endif %}
+  </div>
+  {% block content %}{% endblock %}
+</main>
+<footer class="footer">
+  <div class="container footer-inner">
+    <span><span class="footer-brand">Godpay</span> · UPI payment verification</span>
+    <span><button type="button" data-dialog="privacyDialog">Privacy</button> · <button type="button" data-dialog="contactDialog">Contact</button> · <a href="/guide">Guide</a> · <a href="/docs">API Docs</a> · <a href="/terms">Terms</a> · <a href="/signup">Get API keys</a></span>
+  </div>
+  <div class="container footer-legal">
+    <span>© 2026 Godpay</span>
+    <span>Support: <a href="mailto:godhostings@gmail.com">godhostings@gmail.com</a></span>
+  </div>
+  <div class="container footer-tools"><button type="button" data-dialog="feedbackDialog">Feedback</button><button type="button" data-dialog="contactDialog">Contact support</button></div>
+</footer>
+{% include "_studio_dialogs.html" %}
+<script>
+(function(){
+  var b = document.getElementById('navBurger'), n = document.getElementById('navLinks');
+  if (b && n) b.addEventListener('click', function(){
+    var open = n.classList.toggle('open');
+    b.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+})();
+</script>
+<script src="/static/studio.js?v=godpay-blue-2" defer></script>
+<script src="/static/original-sources.js?v=exact-2" defer></script>
+<script src="/static/original-components.js?v=exact-2" defer></script>
+</body>
+</html>

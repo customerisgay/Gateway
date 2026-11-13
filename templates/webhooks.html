@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Webhooks — Godpay{% endblock %}
+{% block content %}
+
+<div class="container page">
+  <div class="page-head">
+    <div>
+      <h1>Webhooks</h1>
+      <p>Receive signed <code class="inline">payment.verified</code> events after payment verification.</p>
+    </div>
+  </div>
+
+  {% if new_secret %}
+  <div class="key-secret-banner">
+    <strong>New webhook secret — copy it now, shown only once.</strong>
+    <div class="copyline" style="margin-top:.5rem"><code id="whsec">{{ new_secret }}</code><button class="btn btn-sm btn-dark" onclick="navigator.clipboard.writeText(document.getElementById('whsec').innerText)">Copy</button></div>
+    <p class="small" style="margin:0;font-weight:600">Use it to verify the <code class="inline">X-FamGate-Signature: sha256=&lt;hex&gt;</code> header on incoming webhooks.</p>
+  </div>
+  {% endif %}
+
+  <div class="two-col">
+    <form class="card" method="post" action="/webhooks/save">
+      <h3 class="section-title">Endpoint</h3>
+      <label class="flabel" for="url">Webhook URL <small>— public http(s), no localhost/private IPs</small></label>
+      <input type="url" id="url" name="url" value="{{ webhook.url if webhook else '' }}" placeholder="https://yourstore.com/webhooks/famgate" maxlength="400" style="width:100%">
+      <p class="form-note">Leave blank to disable. Use a public HTTPS endpoint.</p>
+      <div class="btn-row" style="margin-top:.9rem">
+        <button class="btn btn-sm btn-dark" type="submit">Save URL</button>
+        <button class="btn btn-sm btn-ghost" type="submit" formaction="/webhooks/test" formnovalidate>Send test webhook</button>
+      </div>
+    </form>
+
+    <div class="card">
+      <h3 class="section-title">Signing secret</h3>
+      <p class="small muted">Current secret preview: <code class="inline">{{ webhook.secret_preview if webhook and webhook.secret_preview else 'not set' }}</code></p>
+      <form method="post" action="/webhooks/regen-secret" onsubmit="return confirm('Rotate the webhook secret? Your server must use the new value immediately.')">
+        <button class="btn btn-sm btn-purple" type="submit">Rotate secret</button>
+      </form>
+      <h3 class="section-title" style="margin-top:1.2rem">Payload example</h3>
+      <pre class="codeblock" style="margin-bottom:0">{
+  "event": "payment.verified",
+  "order_id": "ord_ab12cd34ef56gh78ij9",
+  "provider": "fampay",
+  "amount": 100.42,
+  "currency": "INR",
+  "utr": "412345678901",
+  "payer_name": "ROHIT KUMAR",
+  "client_ref": "INV-2026-991",
+  "paid_at": 1762950000
+}</pre>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1.5rem">
+    <h3 class="section-title">Recent deliveries</h3>
+    {% if deliveries %}
+    <div class="table-wrap" style="box-shadow:none">
+      <table>
+        <thead><tr><th>When</th><th>Event</th><th>Order</th><th>HTTP</th><th>Result</th><th>Response</th></tr></thead>
+        <tbody>
+        {% for d in deliveries %}
+          <tr>
+            <td>{{ d.created_at | dt }}</td>
+            <td class="mono small">{{ d.event }}</td>
+            <td class="mono small">{{ d.order_id[:22] }}</td>
+            <td class="mono">{{ d.status_code or '—' }}</td>
+            <td><span class="pill {{ 'paid' if d.success else 'failed' }}">{{ 'DELIVERED' if d.success else 'FAILED' }}</span></td>
+            <td class="small muted" style="max-width:280px;overflow:hidden;text-overflow:ellipsis">{{ d.response_snippet or '—' }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty">No deliveries yet — they'll show up here after your first verified payment.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

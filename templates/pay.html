@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pay ₹{{ '%.2f'|format(order.exact_amount) }} — {{ merchant.business_name }}</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ asset_v }}">
+<link rel="stylesheet" href="/static/style.css?v={{ asset_v }}">
+<link rel="stylesheet" href="/static/studio.css?v=godpay-mobile-3">
+<style>.share-menu .social-links{display:flex;flex-wrap:wrap;gap:8px}.share-menu .social-links button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;width:72px;min-height:68px;height:auto;padding:10px 4px;border-radius:12px;font-size:10px;color:#e8f1ff}.social-links svg{width:24px;height:24px;flex:none}.social-links [data-share=whatsapp] svg{color:#25d366}.social-links [data-share=telegram] svg{color:#29b6f6}.social-links [data-share=instagram] svg{color:#ff6bb5}.social-links [data-share=facebook] svg{color:#3988ff}</style><style>
+.pay-amount{font-variant-numeric:tabular-nums;letter-spacing:-.035em;font-size:clamp(42px,12vw,64px);line-height:1.2;white-space:nowrap}
+.checkout-spinner{display:inline-block;width:18px;height:18px;box-sizing:border-box;border:2px solid #49617e;border-top-color:#80b6ff;border-radius:50%;animation:checkoutSpin .85s linear infinite;flex-shrink:0;vertical-align:middle}
+@keyframes checkoutSpin{to{transform:rotate(360deg)}}
+#statusLine{display:flex;align-items:center;justify-content:center;gap:9px;line-height:1.6;margin:16px 0}
+.qr-loading{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}.qr-loading[hidden]{display:none!important}
+.pay-mid .deeplinks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:16px 0 0;clear:both}
+.pay-mid .deeplinks a{display:flex;justify-content:center;align-items:center;box-sizing:border-box;min-width:0;min-height:44px;margin:0;padding:10px 8px;line-height:1.3;white-space:normal;text-decoration:none}
+.checkout-instruction{margin:20px 0;color:#a9bed8;font-size:13px;line-height:1.6;text-align:center;clear:both}
+.utr-fallback{margin-top:20px;padding-top:16px;border-top:1px solid #304965;clear:both}.utr-fallback summary{font-size:13px;line-height:1.6;cursor:pointer}.utr-fallback form{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.utr-fallback input{min-width:0;flex:1 1 170px;max-width:100%;box-sizing:border-box}.utr-fallback button{flex:0 0 auto;max-width:100%}
+@media(prefers-reduced-motion:reduce){.checkout-spinner{animation:none}}
+</style></head>
+<body class="pay-body">
+<div class="pay-shell">
+
+  {% if ok %}<div class="flash ok">{{ ok }}</div>{% endif %}
+  {% if err %}<div class="flash err">{{ err }}</div>{% endif %}
+
+  <div class="pay-card" id="payPanel" {% if order.status == 'PAID' %}style="display:none"{% endif %}>
+    <div class="pay-top">
+      <span>{{ merchant.business_name }}</span>
+      <span class="secure"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> UPI · Secure</span>
+    </div>
+    <div class="pay-mid">
+      {% if order.upi_uri %}
+      <div class="merchant-line">Scan QR or tap an app to pay</div>
+      <div class="pay-amount">₹{{ '%.2f'|format(order.exact_amount) }}</div>
+
+      <button class="exact-chip" id="copyExact" type="button" title="Tap to copy exact amount">
+        Pay EXACTLY ₹{{ '%.2f'|format(order.exact_amount) }} <span style="font-size:1.05em">⧉</span>
+      </button>
+
+      <div class="qr-box">
+        <div id="qrLoading" class="qr-loading" role="status"><span class="checkout-spinner" aria-hidden="true"></span><span>Generating your secure QR…</span></div>
+        <img id="qrImage" src="/pay/{{ order.id }}/qr.png" alt="UPI QR — pay ₹{{ '%.2f'|format(order.exact_amount) }}" width="212" height="212">
+      </div>
+      <div><a class="btn btn-sm btn-ghost qr-download" href="/pay/{{ order.id }}/qr.png" download="godpay-qr-{{ order.id }}.png"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:.3rem"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>Download QR</a></div>
+      {% else %}
+      <div class="merchant-line">Secure checkout via {{ pg_title }}</div>
+      <div class="pay-amount">₹{{ '%.2f'|format(order.exact_amount) }}</div>
+      {% if order.provider_token and order.provider_token.startswith('http') %}
+      <div class="qr-box">
+        <img src="/pay/{{ order.id }}/qr.png" alt="Checkout QR — pay ₹{{ '%.2f'|format(order.exact_amount) }}" width="212" height="212" onerror="this.parentElement.style.display='none'">
+      </div>
+      <a class="btn" style="width:100%;justify-content:center;margin:.8rem 0 .4rem" href="{{ order.provider_token }}">Continue to {{ pg_title }} →</a>
+      <p class="muted small">You'll complete the payment on {{ pg_title }}'s secure page. This page updates itself.</p>
+      {% elif order.provider == 'paytm' and paytm_js %}
+      <button class="btn" id="paytmPayBtn" style="width:100%;justify-content:center;margin:.8rem 0 .4rem" type="button">Pay ₹{{ '%.2f'|format(order.exact_amount) }} with Paytm →</button>
+      <p class="muted small">The Paytm checkout opens with the amount pre-filled. This page updates itself.</p>
+      {% elif order.provider == 'mobikwik' and mobikwik_form %}
+      <form id="mobikwikForm" method="post" action="{{ mobikwik_action }}">
+        {% for k, v in mobikwik_form.items() %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
+        <button class="btn" style="width:100%;justify-content:center;margin:.8rem 0 .4rem" type="submit">Pay ₹{{ '%.2f'|format(order.exact_amount) }} with MobiKwik / Zaakpay →</button>
+      </form>
+      <p class="muted small">Redirecting to Zaakpay's secure checkout — UPI (MobiKwik, GPay, PhonePe, BHIM), cards, netbanking. This page updates itself on return.</p>
+      <script>setTimeout(function () { var f = document.getElementById('mobikwikForm'); if (f) f.submit(); }, 700);</script>
+      {% else %}
+      <p class="muted small" style="margin:1rem 0">This order is processed by {{ pg_title }}. If you were not redirected, please contact the merchant.</p>
+      {% endif %}
+      {% endif %}
+
+      <div class="timer" id="timer">15:00</div>
+      <div class="muted small" id="statusLine"><span class="checkout-spinner" aria-hidden="true"></span>Waiting for verified payment…</div>
+
+      {% if order.upi_uri %}
+      <a href="{{ order.upi_uri }}" class="pay-btn"><span class="pay-icon-stack" aria-hidden="true"><span>▣</span><span>₹</span><span>↗</span></span><span>Open in UPI app · ₹{{ '%.2f'|format(order.exact_amount) }}</span></a>
+      <div class="deeplinks">
+        <a href="{{ links.gpay }}">G Pay</a>
+        <a href="{{ links.phonepe }}">PhonePe</a>
+        <a href="{{ links.paytm }}">Paytm</a>
+        <a href="{{ links.bhim }}">BHIM</a>
+      </div>
+      <p class="checkout-instruction">Scan the QR or open in UPI app</p>
+      {% endif %}
+
+      {% if order.upi_uri %}
+      <details class="utr-fallback">
+        <summary>Verify payment by UTR</summary>
+        <form method="post" action="/pay/{{ order.id }}/verify-utr">
+          <input type="text" name="utr" placeholder="12-digit UTR / bank reference" inputmode="numeric" required minlength="8" maxlength="22">
+          <button class="btn btn-sm btn-dark" type="submit">Verify</button>
+        </form>
+        <p class="form-note">Enter the bank reference from your UPI app.</p>
+      </details>
+      {% endif %}
+      {% if order.status == 'PENDING' %}<form method="post" action="/pay/{{ order.id }}/cancel" style="margin-top:24px" onsubmit="return confirm('Cancel this payment? If you already sent money, contact the merchant. Cancellation does not reverse a transfer.')"><input type="hidden" name="cancel_token" value="{{ cancel_token }}"><button class="btn btn-ghost" type="submit" style="width:100%;justify-content:center">Cancel payment</button></form><p style="font-size:13px;line-height:1.6;color:#a9bed8">Cancellation does not reverse a transfer already sent.</p>{% endif %}
+    </div>
+  </div>
+
+  <div class="pay-card success-anim" id="successPanel" style="{% if order.status != 'PAID' %}display:none{% endif %}">
+    <div class="success-panel">
+<div class="success-check">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5.2 5.2L20 6.8" stroke="#fdf8ec" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2>Payment received!</h2>
+      <p class="muted" style="margin-top:.3rem">₹{{ '%.2f'|format(order.exact_amount) }} from <strong id="payerName">{{ order.payer_name or 'you' }}</strong></p>
+      
+      <article class="receipt-ticket" id="receiptTicket" data-order="{{ order.id }}" data-amount="{{ '%.2f'|format(order.exact_amount) }}" data-merchant="{{ merchant.business_name }}"><div class="receipt-main"><span class="receipt-label">Godpay · payment receipt</span><h3>Paid. Confirmed. Yours.</h3><div class="receipt-row"><span>Merchant</span><strong>{{ merchant.business_name }}</strong></div><div class="receipt-row"><span>Order</span><strong>{{ order.id }}</strong></div><div class="receipt-row"><span>Bank reference / UTR</span><strong id="utrValue">{{ order.utr or '…' }}</strong></div><div class="receipt-row"><span>Status</span><strong>VERIFIED · PAID</strong></div></div><div class="receipt-stub"><div><span class="receipt-label">Amount received</span><br><strong>₹{{ '%.2f'|format(order.exact_amount) }}</strong></div><div class="receipt-barcode" aria-hidden="true"></div></div></article>
+      <div class="receipt-actions"><button type="button" class="btn btn-ghost" id="shareReceipt" aria-expanded="false" aria-controls="receiptShareMenu">↗ Share</button></div>
+      <div class="share-menu" id="receiptShareMenu"><div class="social-links"><button type="button" data-share="whatsapp" title="Share receipt image via WhatsApp" aria-label="Share receipt image via WhatsApp"><svg aria-hidden="true" fill="currentColor" height="24" role="img" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path></svg><span>WhatsApp</span></button><button type="button" data-share="telegram" title="Share receipt image via Telegram" aria-label="Share receipt image via Telegram"><svg aria-hidden="true" fill="currentColor" height="24" role="img" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"></path></svg><span>Telegram</span></button><button type="button" data-share="x" title="Share receipt image via X" aria-label="Share receipt image via X"><svg aria-hidden="true" fill="currentColor" height="24" role="img" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"></path></svg><span>X</span></button><button type="button" data-share="instagram" title="Share receipt image via Instagram" aria-label="Share receipt image via Instagram"><svg aria-hidden="true" fill="currentColor" height="24" role="img" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"></path></svg><span>Instagram</span></button><button type="button" data-share="facebook" title="Share receipt image via Facebook" aria-label="Share receipt image via Facebook"><svg aria-hidden="true" fill="currentColor" height="24" role="img" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"></path></svg><span>Facebook</span></button><button type="button" data-share="sms" title="Share receipt image via SMS" aria-label="Share receipt image via SMS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 4h16v12H8l-4 4V4z"/></svg><span>SMS</span></button><button type="button" data-share="more" title="Share receipt image via More apps" aria-label="Share receipt image via More apps"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.5 10.5 7-4m-7 7 7 4"/></svg><span>More apps</span></button><button type="button" data-share="download" title="Download receipt image" aria-label="Download receipt image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg><span>Download</span></button></div><p>Shares a receipt image. Choose the app from your device share menu. If image sharing is unavailable, download the image and attach it.</p></div>
+      <p class="share-note" id="receiptActionNote" aria-live="polite"></p><p class="small muted" style="margin-top:16px">Keep your bank reference private.</p>
+    </div>
+  </div>
+
+  <p class="center" style="color:var(--muted);font-size:.72rem;margin-top:.9rem;font-weight:600;letter-spacing:.05em">Powered by <strong style="color:#7dd3fc">Godpay</strong> · 0% fee direct-UPI collection</p>
+</div>
+
+{% if paytm_js %}<script src="{{ paytm_js }}"></script>{% endif %}
+<script>
+(function () {
+  var orderId = {{ order.id | tojson }};
+  var initialStatus = {{ order.status | tojson }};
+  var expiresAt = {{ order.expires_at | int }};
+  var exactAmount = {{ '%.2f'|format(order.exact_amount) | tojson }};
+  var upiLink = {{ order.upi_uri | tojson }};
+
+  var payPanel = document.getElementById('payPanel');
+  var successPanel = document.getElementById('successPanel');
+  var timerEl = document.getElementById('timer');
+  var statusLine = document.getElementById('statusLine');
+
+  // copy buttons (only present for UPI rails)
+  function flash(btn, text) { var old = btn.innerHTML; btn.innerHTML = text; setTimeout(function(){ btn.innerHTML = old; }, 1200); }
+  var copyExact = document.getElementById('copyExact');
+  if (copyExact) copyExact.addEventListener('click', function () {
+    navigator.clipboard.writeText(exactAmount).then(() => flash(this, 'Copied ₹' + exactAmount));
+  });
+
+
+  function fireConfetti() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var c = document.createElement('canvas');
+    c.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9999';
+    document.body.appendChild(c);
+    var ctx = c.getContext('2d');
+    c.width = innerWidth; c.height = innerHeight;
+    var colors = ['#38bdf8', '#60a5fa', '#818cf8', '#a78bfa', '#e879f9', '#34d399', '#e2ecff'];
+    var P = [];
+    for (var i = 0; i < 110; i++) {
+      P.push({ x: c.width / 2 + (Math.random() - .5) * 120, y: c.height * 0.32,
+        vx: (Math.random() - .5) * 14, vy: -Math.random() * 13 - 4,
+        w: 4 + Math.random() * 6, h: 6 + Math.random() * 10,
+        rot: Math.random() * Math.PI, vr: (Math.random() - .5) * .3,
+        color: colors[(Math.random() * colors.length) | 0] });
+    }
+    var t0 = performance.now();
+    (function frame(t) {
+      var dt = Math.min(32, t - (frame._l || t)); frame._l = t;
+      ctx.clearRect(0, 0, c.width, c.height);
+      var alive = false;
+      for (var i = 0; i < P.length; i++) {
+        var p = P[i];
+        p.vy += 0.38 * (dt / 16.7); p.x += p.vx * (dt / 16.7); p.y += p.vy * (dt / 16.7); p.rot += p.vr * (dt / 16.7);
+        if (p.y < c.height + 30) alive = true; else continue;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+        ctx.fillStyle = p.color; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
+      }
+      if (alive && t - t0 < 3500) requestAnimationFrame(frame); else c.remove();
+    })(t0);
+  }
+  function showSuccess(utr, payer) {
+    payPanel.style.display = 'none';
+    successPanel.style.display = 'block';
+    if (utr) document.getElementById('utrValue').textContent = utr;
+    if (payer) document.getElementById('payerName').textContent = payer;
+    fireConfetti();
+  }
+  if (initialStatus === 'PAID') { showSuccess({{ order.utr | tojson }}, {{ order.payer_name | tojson }}); return; }
+
+  // countdown
+  function tickTimer() {
+    var left = Math.max(0, expiresAt - Math.floor(Date.now() / 1000));
+    var m = Math.floor(left / 60), s = left % 60;
+    timerEl.textContent = m + ':' + String(s).padStart(2, '0') + ' left to pay';
+    timerEl.classList.toggle('low', left <= 60);
+    if (left <= 0) {location.reload();return 0;}
+    return left;
+  }
+  tickTimer();
+  setInterval(tickTimer, 1000);
+
+  // poll status
+  var polls = 0;
+  var poll = setInterval(function () {
+    polls++;
+    fetch('/pay/' + encodeURIComponent(orderId) + '/status', { headers: { 'Accept': 'application/json' } })
+      .then(r => r.json())
+      .then(function (data) {
+        if (!data || !data.success) return;
+        if (data.status === 'PAID') { clearInterval(poll); showSuccess(data.utr, data.payer_name); }
+        else if (['EXPIRED','CANCELLED','FAILED'].includes(data.status)) { clearInterval(poll); location.reload(); }
+      })
+      .catch(function () { /* keep trying */ });
+    if (polls > 400) clearInterval(poll);
+  }, 3000);
+
+  // Paytm: boot the All-in-One SDK when configured
+  {% if paytm_js %}
+  var paytmBtn = document.getElementById('paytmPayBtn');
+  var paytmConfig = {
+    "root": "",
+    "flow": "DEFAULT",
+    "data": {
+      "orderId": {{ order.id | tojson }},
+      "token": {{ order.provider_token | tojson }},
+      "tokenType": "TXN_TOKEN",
+      "amount": {{ '%.2f'|format(order.exact_amount) | tojson }}
+    },
+    "merchant": { "mid": {{ paytm_cfg.mid | tojson }}, "redirect": true }
+  };
+  function openPaytm() {
+    if (window.Paytm && Paytm.CheckoutJS) {
+      Paytm.CheckoutJS.init(paytmConfig).then(function () { Paytm.CheckoutJS.invoke(); })
+        .catch(function (err) { console.error('Paytm init failed', err); if (paytmBtn) paytmBtn.textContent = 'Tap to retry Paytm'; });
+    } else if (paytmBtn) {
+      paytmBtn.textContent = 'Paytm failed to load — check your MID';
+    }
+  }
+  if (paytmBtn) paytmBtn.addEventListener('click', openPaytm);
+  window.addEventListener('load', function () { setTimeout(openPaytm, 600); });
+  {% endif %}
+})();
+</script>
+<script src="/static/studio.js?v=receipt-image-5" defer></script>
+<script src="/static/original-sources.js?v=exact-2" defer></script>
+<script src="/static/original-components.js?v=receipt-image-5" defer></script>
+</body>
+</html>

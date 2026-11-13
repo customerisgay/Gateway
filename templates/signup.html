@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Create your Godpay account{% endblock %}
+{% block content %}
+<div class="auth-split">
+  <aside class="auth-visual" aria-hidden="true">
+    <div class="auth-visual-tag">Zero gateway fees</div>
+    <h2>One QR. <em>Every</em> UPI app.</h2>
+    <ul>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.2 5.2L20 6.8"/></svg><span><b>GPay · PhonePe · Paytm · FamPay</b> — one dynamic QR for everyone</span></li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.2 5.2L20 6.8"/></svg><span><b>₹1 orders verify</b> the moment the customer pays — you watch it turn green</span></li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.2 5.2L20 6.8"/></svg><span><b>REST API + signed webhooks</b> — drop Godpay into your app in one evening</span></li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5.2 5.2L20 6.8"/></svg><span><b>You hold the money.</b> Godpay never touches a rupee of it</span></li>
+    </ul>
+    <div class="auth-visual-tag" style="color:#a7f3d0;border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.07)">Free forever — your money never touches us</div>
+  </aside>
+  <form class="card auth-card" method="post" action="/signup">
+    <h1>Create your gateway</h1>
+    <p class="muted small">Create your merchant account.</p>
+
+    <label class="flabel" for="business_name">Business / store name</label>
+    <input type="text" id="business_name" name="business_name" placeholder="Sharma Electronics" required maxlength="80" autofocus>
+
+    <label class="flabel" for="email">Email</label>
+    <input type="email" id="email" name="email" placeholder="you@example.com" required maxlength="160">
+
+    <label class="flabel" for="password">Password <small>— min 8 characters</small></label>
+    <input type="password" id="password" name="password" placeholder="••••••••••" required minlength="8" autocomplete="new-password">
+
+    <label class="flabel" for="confirm">Confirm password</label>
+    <input type="password" id="confirm" name="confirm" placeholder="••••••••••" required minlength="8" autocomplete="new-password">
+
+    <div class="btn-row" style="margin-top:1.2rem">
+      <button class="btn btn-shine btn-auth" type="submit" style="flex:1;justify-content:center">Create account <span class="btn-arrow">→</span></button>
+    </div>
+    <p class="alt">Already have an account? <a href="/login"><strong>Log in</strong></a></p>
+  </form>
+</div>
+{% endblock %}

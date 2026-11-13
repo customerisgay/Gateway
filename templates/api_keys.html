@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}API Keys — Godpay{% endblock %}
+{% block content %}
+
+<div class="container page">
+  <div class="page-head">
+    <div>
+      <h1>API Keys</h1>
+      <p>Use <code class="inline">X-Api-Key</code> to authenticate API requests. Keep keys private.</p>
+    </div>
+  </div>
+
+  {% if new_key %}
+  <div class="key-secret-banner">
+    <strong>New API key created — copy it now, it won't be shown again.</strong>
+    <label class="flabel" style="margin-top:.6rem">Public key <small>(use as X-Api-Key)</small></label>
+    <div class="copyline"><code id="newKey">{{ new_key }}</code><button class="btn btn-sm btn-dark" onclick="navigator.clipboard.writeText(document.getElementById('newKey').innerText)">Copy</button></div>
+    <label class="flabel">Secret <small>(for HMAC webhook verification only — never send to clients)</small></label>
+    <div class="copyline"><code id="newSecret">{{ new_secret }}</code><button class="btn btn-sm btn-dark" onclick="navigator.clipboard.writeText(document.getElementById('newSecret').innerText)">Copy</button></div>
+  </div>
+  {% endif %}
+
+  <form class="card" method="post" action="/api-keys/create" style="display:flex;gap:.7rem;align-items:end;flex-wrap:wrap">
+    <div style="flex:1;min-width:220px">
+      <label class="flabel" for="label">Key label</label>
+      <input type="text" id="label" name="label" placeholder="Production website" maxlength="80" required>
+    </div>
+    <button class="btn" type="submit">+ Generate key</button>
+  </form>
+
+  <div class="card" style="margin-top:1.5rem">
+    <h3 class="section-title">Your keys</h3>
+    {% if keys %}
+      {% for k in keys %}
+      <div class="key-row">
+        <div>
+          <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap">
+            <strong>{{ k.label }}</strong>
+            {% if k.revoked %}<span class="pill failed">REVOKED</span>{% else %}<span class="pill paid">ACTIVE</span>{% endif %}
+          </div>
+          <div class="copyline" style="margin:.45rem 0 .2rem"><code>{{ k.api_key }}</code><button class="btn btn-sm btn-ghost" onclick="navigator.clipboard.writeText('{{ k.api_key }}')">Copy</button></div>
+          <div class="muted small">Secret: {{ k.secret_preview }} · Created {{ k.created_at | dt }} · Last used {{ (k.last_used_at | dt) if k.last_used_at else 'never' }}</div>
+        </div>
+        {% if not k.revoked %}
+        <button class="btn btn-sm btn-danger revoke-btn" type="button" data-id="{{ k.id }}" data-label="{{ k.label }}">Revoke</button>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty">No keys yet — generate your first one above.</div>
+    {% endif %}
+  </div>
+</div>
+
+<dialog class="revoke-modal" id="revokeDialog" aria-labelledby="revokeTitle">
+  <div class="warn-ic">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+  </div>
+  <h3 id="revokeTitle">Revoke “<span id="revokeLabel">key</span>”?</h3>
+  <ul>
+    <li>Any integration using this key starts failing with <code class="inline">401</code> immediately.</li>
+    <li>This <strong>cannot be undone</strong> — you'll need a new key and to redeploy it everywhere.</li>
+    <li>Your webhook secret stays valid, but signatures from this key are gone.</li>
+  </ul>
+  <form method="post" id="revokeForm" action="">
+    <div class="btn-row" style="justify-content:flex-end">
+      <button type="button" class="btn btn-ghost btn-sm" id="revokeCancel">Keep it</button>
+      <button type="submit" class="btn btn-sm btn-danger btn-danger-shine">Revoke permanently</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(function(){
+  var dlg = document.getElementById('revokeDialog');
+  var form = document.getElementById('revokeForm');
+  var label = document.getElementById('revokeLabel');
+  document.querySelectorAll('.revoke-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      form.action = '/api-keys/' + btn.dataset.id + '/revoke';
+      label.textContent = btn.dataset.label || 'key';
+      if (dlg.showModal) dlg.showModal(); else if (confirm('Revoke this key?')) form.submit();
+    });
+  });
+  document.getElementById('revokeCancel').addEventListener('click', function(){ dlg.close(); });
+  dlg.addEventListener('click', function(e){ if (e.target === dlg) dlg.close(); });
+})();
+</script>
+{% endblock %}

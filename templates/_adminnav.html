@@ -1,0 +1,10 @@
+<div class="container" style="padding-top:1rem">
+  <div class="appnav-bar">
+    <span class="admin-badge">ADMIN</span>
+    {% set path = request.url.path %}
+    <a class="appnav-link {{ 'active' if path == '/admin' else '' }}" href="/admin">Overview</a>
+    <a class="appnav-link {{ 'active' if path.startswith('/admin/users') else '' }}" href="/admin/users">Users</a>
+    <a class="appnav-link {{ 'active' if path.startswith('/admin/orders') else '' }}" href="/admin/orders">Records</a>
+    <a class="appnav-link" href="/dashboard" style="margin-left:auto">← Merchant dashboard</a>
+  </div>
+</div>
